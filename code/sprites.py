@@ -3,6 +3,7 @@ from settings import *
 from random import randint, choice
 from timer import Timer
 
+
 class Generic(pygame.sprite.Sprite):
     def __init__(self, pos, surf, groups, z=LAYERS['main']):
         super().__init__(groups)
@@ -42,6 +43,24 @@ class WildFlower(Generic):
         self.hitbox = self.rect.copy().inflate((-20, -self.rect.height * 0.9))
 
 
+class Particle(Generic):
+    def __init__(self, pos, surf, groups, z, duration=200):
+        super().__init__(pos, surf, groups, z)
+        self.start_time = pygame.time.get_ticks()
+        self.duration = duration
+
+        # create white surface
+        mask_surf = pygame.mask.from_surface(self.image)
+        new_surf = mask_surf.to_surface()
+        new_surf.set_colorkey((0, 0, 0,))
+        self.image = new_surf
+
+    def update(self, dt):
+        current_time = pygame.time.get_ticks()
+        if current_time - self.start_time > self.duration:
+            self.kill()
+
+
 class Tree(Generic):
     def __init__(self, pos, surf, groups, name):
         super().__init__(pos, surf, groups)
@@ -67,13 +86,24 @@ class Tree(Generic):
         # remove an apple
         if len(self.apple_sprites.sprites()) > 0:  # only removes an apple if the tree has apples
             random_apple = choice(self.apple_sprites.sprites())
+            Particle(
+                pos=random_apple.rect.topleft,
+                surf=random_apple.image,
+                groups=self.groups()[0],
+                z=LAYERS['fruit'])
             random_apple.kill()
 
     def check_death(self):
         if self.health <= 0:
+            Particle(
+                pos=self.rect.topleft,
+                surf=self.image,
+                groups=self.groups()[0],
+                z=LAYERS['fruit'],
+                duration=300)
             self.image = self.stump_surf
             self.rect = self.image.get_rect(midbottom=self.rect.midbottom)
-            self.hitbox = self.rect.copy().inflate(-10, -self.rect.height*0.6)
+            self.hitbox = self.rect.copy().inflate(-10, -self.rect.height * 0.6)
             self.alive = False
 
     def update(self, dt):
