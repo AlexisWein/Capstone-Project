@@ -3,7 +3,7 @@ from settings import *
 from support import *
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos, group, collision_sprites):
+    def __init__(self, pos, group, collision_sprites, interaction):
         super().__init__(group)
 
         self.import_assets()
@@ -18,10 +18,12 @@ class Player(pygame.sprite.Sprite):
         # movement attributes
         self.direction = pygame.math.Vector2()
         self.pos = pygame.math.Vector2(self.rect.center)
-        self.speed = 300
+        self.speed = 350
         
         self.hitbox = self.rect.copy().inflate((-60, -60))
         self.collision_sprites = collision_sprites
+        #self.interaction_sprites = interaction_sprites
+        self.interaction = interaction
 
     def import_assets(self):
         self.animations = {'up': [],'down': [],'left': [],'right': []}
@@ -41,24 +43,24 @@ class Player(pygame.sprite.Sprite):
         keys = pygame.key.get_pressed()
 
         # directions 
-        if keys[pygame.K_UP]:
+        if keys[pygame.K_UP] or keys[pygame.K_w]:
             self.direction.y = -1
             self.status = 'up'
-        elif keys[pygame.K_DOWN]:
+        elif keys[pygame.K_DOWN] or keys[pygame.K_s]:
             self.direction.y = 1
             self.status = 'down'
         else:
             self.direction.y = 0
 
-        if keys[pygame.K_RIGHT]:
+        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             self.direction.x = 1
             self.status = 'right'
-        elif keys[pygame.K_LEFT]:
+        elif keys[pygame.K_LEFT] or keys[pygame.K_a]:
             self.direction.x = -1
             self.status = 'left'
         else:
             self.direction.x = 0
-
+            
     def collision(self,direction):
         for sprite in self.collision_sprites.sprites():
             if hasattr(sprite, 'hitbox'):
@@ -101,3 +103,4 @@ class Player(pygame.sprite.Sprite):
 
         self.move(dt)
         self.animate(dt)
+        #print(self.pos.x, self.pos.y)

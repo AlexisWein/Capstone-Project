@@ -13,6 +13,10 @@ class Bushes(Generic):
     def __init__(self, pos, surf, groups, name):
         super().__init__(pos, surf, groups)
 
+class Alert(Generic):
+    def __init__(self, pos, surf, groups, name):
+        super().__init__(pos, surf, groups)
+
 class Trees(Generic):
     def __init__(self, pos, surf, groups, name):
         super().__init__(pos, surf, groups)
